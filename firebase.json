@@ -12,12 +12,23 @@
     ],
     "rewrites": [
       {
+        "source": "/s/**",
+        "function": "s"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
-      },{
-        "source": "/s/**",
-        "function": "share"
+      },
+      {
+        "source": "/h/**",
+        "function": "helloWorld"
       }
     ]
+  },
+  "functions": {
+    "source": "functions"
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }

@@ -1,8 +1,12 @@
 <template>
 <div id="mypage">
-  <span>こんにちは, {{ user.displayName }}さん</span>
+  <div>
+  {{ user.displayName }}でログインしています
+  <br/>
   <button @click="logout">ログアウト</button>
+  </div>
 </div>
+
 </template>
 
 <script>

@@ -2,7 +2,7 @@
   <div class="container">
     <div>
       <h1 class="title">
-        ナナメのみちしるべ
+        ナナメのみちしるべ(α)
       </h1>
       <h2 class="subtitle">
         あつまれ　どうぶつの森　アイテム交換支援ツール
@@ -12,22 +12,25 @@
              variant="info"
              @dismissed="dismissCountDown=0"
              @dismiss-count-down="countDownChanged">{{infoMessage}}
-      </b-alert>  
+      </b-alert>
       <div class="links">
+        <div>
+          このアプリのTwitterハッシュタグ <a href="https://twitter.com/search?q=%23%E3%83%8A%E3%83%8A%E3%81%BF%E3%81%A1&src=typed_query" target="_blank">#ナナみち</a>
+        </div>
         <Home v-if="!isLogin"></Home>
         <Mypage v-if="isLogin" :user="userData"></Mypage>
       </div>
-      <div>
-        <form ref="form">
+      <div v-if="isLogin">
+        <form ref="form" class="m-1">
           <div class="form-group row">
-            <label class="col-form-label col-sm-3" for="name">アイテム名</label>
-            <div class="col-sm-9">
+            <label class="col-form-label col-12 col-lg-3" for="name">アイテム名</label>
+            <div class="col-12 col-lg-9">
               <input class="form-control" v-model="name" id="name">
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-form-label col-sm-3" for="variation">バリエーション(任意)</label>
-            <div class="col-sm-9">
+            <label class="col-form-label col-12 col-lg-3" for="variation">バリエーション(任意)</label>
+            <div class="col-12 col-lg-9">
               <input class="form-control" v-model="variation" id="variation">
             </div>
           </div>
@@ -35,15 +38,24 @@
           <input class="btn btn-primary" type="button" v-on:click="addSupply" value="をあげたい">
         </form>
       </div>
-      <div>
-        <input class="btn btn-primary" type="button" v-on:click="makeImage" value="リストをTwitterに投稿(今作ってます、今は代わりに画像がダウンロードできるよ)">
+      <div v-if="isLogin" class="m-2">
+        <input class="btn btn-primary" type="button" v-on:click="makeImage" value="リストをTwitterに投稿">
       </div>
-      <b-container fluid id="image-node">
+      <b-container fluid v-if="isLogin" id="image-node" class="bg-light">
         <b-row>
-          <b-col><Demands v-if="isLogin" :demands="demands"></Demands></b-col>
-          <b-col><Supplies v-if="isLogin" :supplies="supplies"></Supplies></b-col>
+          <b-col sm="6"><Demands v-if="isLogin" :demands="demands"></Demands></b-col>
+          <b-col sm="6"><Supplies v-if="isLogin" :supplies="supplies"></Supplies></b-col>
         </b-row>
       </b-container>
+      <div class="m-2">
+        <div>作った人：<a href="https://twitter.com/vivit_jc" target="_blank">@vivit_jc</a></div>
+        <div>これからやること</div>
+        <ul>
+          <li>レスポンシブ対応（スマホ対応）</li>
+          <li>Twitterへの画像投稿</li>
+          <li>誰からもらった・誰にあげたかを記録する機能</li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -73,6 +85,7 @@ export default {
           dismissCountDown: 0,
           dismissSecs: 3,
           infoMessage: "", 
+          uuid: '1',
       }
   },
   components: {
@@ -142,7 +155,7 @@ export default {
       var user = firebase.auth().currentUser;
       let dbdata = {
         name: this.name,
-        variationaa: this.variation,
+        variation: this.variation,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         uid: user.uid
       };
@@ -158,28 +171,22 @@ export default {
 
     },
 
-/*
     async upload(data) {
-      const db = firebase.firestore();
       const sRef = firebase.storage().ref();
-      const name = firebase.auth().currentUser.uid;
+      const name = firebase.auth().currentUser.uid
       const fileRef = sRef.child(`${name}.png`);
-      fileRef.putString(data, "data_url")
-        .then(function (dataUrl) {
-         console.log("download")
-          var link = document.createElement('a');
-          link.download = 'list.png';
-          link.href = dataUrl;
-          link.click();
-        });
-      this.showInfo("Twitterに投稿しました！")
-    },
-*/
-    async upload(dataUrl) {
-        var link = document.createElement('a');
-        link.download = 'list.png';
-        link.href = dataUrl;
-        link.click();
+      
+      await fileRef.putString(data, 'data_url')
+      const url = await fileRef.getDownloadURL()
+      console.log(url)
+      const card = db.collection('cards').doc(name)
+      await card.set({
+        url
+      });
+      const tw_url = "https://twitter.com/share?url=https://nanamichi-8cd8a.web.app/s/"
+       + name
+       + "&hashtags=ナナみち&text=ナナメのみちしるべ　あつ森アイテム交換支援ツール"
+      window.open(tw_url, '_blank')
     },
 
     countDownChanged(dismissCountDown)  {
@@ -209,15 +216,15 @@ export default {
   font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
     'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   display: block;
-  font-weight: 300;
-  font-size: 100px;
+  //font-weight: 300;
+  //font-size: 100px;
   color: #35495e;
   letter-spacing: 1px;
 }
 
 .subtitle {
-  font-weight: 300;
-  font-size: 42px;
+  //font-weight: 300;
+  //font-size: 42px;
   color: #526488;
   word-spacing: 5px;
   padding-bottom: 15px;
