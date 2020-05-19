@@ -39,7 +39,9 @@
         </form>
       </div>
       <div v-if="isLogin" class="m-2">
-        <input class="btn btn-primary" type="button" v-on:click="makeImage" value="リストをTwitterに投稿">
+        <input class="btn btn-primary" type="button" v-on:click="upload" value="リストをTwitterに投稿">
+        <input class="btn btn-primary" type="button" v-on:click="download" value="画像をダウンロード"><br/>
+        ※投稿画面が開かない場合は、ポップアップブロックを無効にしてください。
       </div>
       <b-container fluid v-if="isLogin" id="image-node" class="bg-light">
         <b-row>
@@ -48,11 +50,10 @@
         </b-row>
       </b-container>
       <div class="m-2">
-        <div>作った人：<a href="https://twitter.com/vivit_jc" target="_blank">@vivit_jc</a></div>
-        <div>これからやること</div>
+        <div>ツール制作：<a href="https://twitter.com/vivit_jc" target="_blank">@vivit_jc</a></div>
+        <div>これから作る・作りかけ</div>
         <ul>
           <li>レスポンシブ対応（スマホ対応）</li>
-          <li>Twitterへの画像投稿</li>
           <li>誰からもらった・誰にあげたかを記録する機能</li>
         </ul>
       </div>
@@ -164,29 +165,38 @@ export default {
       this.variation = ""
     },
     
-    async makeImage(){
+    makeImage(){
       // const el = this.$refs.target.$el
-      const output = await domtoimage.toPng(document.getElementById('image-node'))
-      await this.upload(output)
-
+      const output = domtoimage.toPng(document.getElementById('image-node'))
+      return output;
     },
 
-    async upload(data) {
+    async upload() {
       const sRef = firebase.storage().ref();
       const name = firebase.auth().currentUser.uid
       const fileRef = sRef.child(`${name}.png`);
-      
+      const data = await this.makeImage();
+
       await fileRef.putString(data, 'data_url')
       const url = await fileRef.getDownloadURL()
-      console.log(url)
       const card = db.collection('cards').doc(name)
       await card.set({
-        url
+        url: url,
+        uid: name
       });
       const tw_url = "https://twitter.com/share?url=https://nanamichi-8cd8a.web.app/s/"
        + name
        + "&hashtags=ナナみち&text=ナナメのみちしるべ　あつ森アイテム交換支援ツール"
       window.open(tw_url, '_blank')
+    },
+
+    async download() {
+      await this.makeImage().then(function (dataUrl) {
+        var link = document.createElement('a');
+        link.download = 'list.png';
+        link.href = dataUrl;
+        link.click();
+      });
     },
 
     countDownChanged(dismissCountDown)  {

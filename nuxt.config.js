@@ -55,6 +55,10 @@ export default {
     '@nuxtjs/dotenv'
   ],
 
+  router: {
+    mode: 'hash'
+  },
+
   axios: {
      baseURL: process.env.DATABASE_URL
   },

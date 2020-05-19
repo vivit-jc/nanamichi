@@ -28,7 +28,7 @@ const tw_description = 'あつまれ　どうぶつの森　アイテム交換�
 const tw_site = '';
 const tw_creator = '';
 
-const genHtml = image_url => `
+const genHtml = (image_url,uid) => `
 <!DOCTYPE html>
 <html>
   <head>
@@ -54,8 +54,8 @@ const genHtml = image_url => `
     <meta name="twitter:creator" content="${tw_creator}">
   </head>
   <body>
-  <p><a href="https://nanamichi-8cd8a.web.app/">ナナメのみちしるべを使ってみる</a></p>
-  <img src="${image_url}">
+    <p><a href="https://nanamichi-8cd8a.web.app/">ナナメのみちしるべを使ってみる</a></p>
+    <img src="${image_url}">
     <script>
     </script>
   </body>
@@ -71,13 +71,11 @@ app.get('/s/:id', (req, res) => {
         res.status(404).send('404 Not Exist');
       } else {
         const data = result.data();
-        const html = genHtml(data.url);
+        const html = genHtml(data.url,data.uid);
         res.set('cache-control', 'public, max-age=3600');
         res.send(html);
       }
     });
 });
 exports.s = functions.https.onRequest(app);
-exports.helloWorld = functions.https.onRequest((request, response) => {
-  response.send("Hello from Firebase!");
-});
+
