@@ -56,7 +56,7 @@ export default {
   ],
 
   router: {
-    mode: 'hash'
+ //   mode: 'hash'
   },
 
   axios: {
